@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-jellycat-dark: #070707;
+  --color-jellycat-warm: #C8856A;
+  --color-jellycat-pink: #00C2DE;
+  --color-jellycat-cream: #FDF8F2;
+  --color-jellycat-coral: #E8A598;
+  --color-surface-pale-blush: #F0E4DC;
+  --color-surface-warm-white: #F7EEE8;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f7f3f1;
+  --color-surface-container-high: #ebe7e6;
+  --color-text-muted-gray: #8C7A70;
+  --color-on-surface-variant: #494740;
+  --color-outline-variant: #cbc6bd;
+  --color-outline: #7a776f;
+  --color-background: #fdf8f7;
+  --color-on-background: #1c1b1b;
+  --color-on-surface: #1c1b1b;
+
+  --font-body-base: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-heading-h2: "Epilogue", ui-sans-serif, system-ui, sans-serif;
+  --font-subheading-h3: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display-h1: "Epilogue", ui-sans-serif, system-ui, sans-serif;
+  --font-caption: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-cta-button: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --font-epilogue: "Epilogue", ui-sans-serif, system-ui, sans-serif;
+  --font-jakarta: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --text-body-base: 18px;
+  --text-body-base--line-height: 1.6;
+  --text-body-base--font-weight: 400;
+
+  --text-heading-h2: 48px;
+  --text-heading-h2--line-height: 1.2;
+  --text-heading-h2--font-weight: 600;
+
+  --text-subheading-h3: 32px;
+  --text-subheading-h3--line-height: 1.3;
+  --text-subheading-h3--font-weight: 600;
+
+  --text-display-h1: 80px;
+  --text-display-h1--line-height: 1.1;
+  --text-display-h1--letter-spacing: -0.02em;
+  --text-display-h1--font-weight: 700;
+
+  --text-caption: 14px;
+  --text-caption--line-height: 1.4;
+  --text-caption--letter-spacing: 0.02em;
+  --text-caption--font-weight: 500;
+
+  --text-cta-button: 16px;
+  --text-cta-button--line-height: 1.0;
+  --text-cta-button--font-weight: 600;
+
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-base: 8px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+  --spacing-xxl: 64px;
+  --spacing-gutter: 24px;
+  --spacing-section-mobile: 64px;
+  --spacing-section-desktop: 120px;
+  --spacing-max-width: 1280px;
+}
+
+body {
+  font-family: var(--font-body-base);
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+}
+
+.ambient-shadow {
+  box-shadow: 0 2px 12px rgba(140, 122, 112, 0.06);
+}
+
+.glass-card {
+  background: rgba(253, 248, 242, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
