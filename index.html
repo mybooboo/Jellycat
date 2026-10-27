@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>활동노트 - 생기부 활동 기록</title>
+<style>
+:root{--bg:#f6f7f4;--card:#fff;--tx:#1f2a27;--mu:#66726e;--ln:#e1e5e0;--pr:#2f7d6b;--pr2:#e3f1ed;--dg:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171c1a;--card:#212825;--tx:#e8efec;--mu:#9aa8a3;--ln:#323b37;--pr:#5fc0aa;--pr2:#23382f;--dg:#ff7b6b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171c1a;--card:#212825;--tx:#e8efec;--mu:#9aa8a3;--ln:#323b37;--pr:#5fc0aa;--pr2:#23382f;--dg:#ff7b6b;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 "Pretendard","Noto Sans KR",system-ui,sans-serif}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--ln);display:flex;gap:6px;align-items:center;padding:8px 14px;flex-wrap:wrap}
+header b{font-size:18px;margin-right:auto;color:var(--pr)}
+nav button{background:none;border:0;color:var(--mu);font:inherit;padding:6px 12px;border-radius:8px;cursor:pointer}nav button.on{background:var(--pr2);color:var(--pr);font-weight:700}
+main{max-width:980px;margin:0 auto;padding:16px 14px 90px}
+h2{margin:6px 0 12px;font-size:22px}h3{margin:0 0 8px;font-size:16px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-bottom:12px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,.btn{font:inherit;cursor:pointer}
+.b{background:var(--pr);color:#fff;border:0;border-radius:10px;padding:9px 14px}.b.s{background:var(--card);color:var(--tx);border:1px solid var(--ln)}.b.d{background:none;color:var(--dg);border:1px solid var(--dg)}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0 16px}.big .b{padding:14px;font-weight:700}
+input,select,textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--ln);border-radius:10px;background:var(--card);color:var(--tx)}textarea{min-height:84px;resize:vertical}
+label{display:block;font-size:14px;color:var(--mu);margin:10px 0 3px}
+.tag{display:inline-block;font-size:13px;padding:1px 9px;border-radius:99px;background:var(--pr2);color:var(--pr);margin:2px 3px 2px 0}
+.ty{font-size:13px;font-weight:700;padding:1px 9px;border-radius:99px;color:#fff;display:inline-block}
+.mu{color:var(--mu);font-size:14px}.demo{font-size:12px;border:1px dashed var(--mu);color:var(--mu);border-radius:6px;padding:0 6px;margin-left:4px}
+.bar{height:10px;border-radius:5px;margin:2px 0 7px}
+.item{cursor:pointer}.item:hover{border-color:var(--pr)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:600px){.two{grid-template-columns:1fr}}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:8px 16px;border-radius:99px;z-index:20}
+#ai{position:fixed;right:0;top:0;bottom:0;width:min(420px,100%);background:var(--card);border-left:1px solid var(--ln);z-index:15;display:none;flex-direction:column;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px))}
+#ai.open{display:flex}#log{flex:1;overflow:auto;padding:6px 0}
+.m{padding:8px 12px;border-radius:12px;margin:6px 0;white-space:pre-wrap;max-width:92%}.m.u{background:var(--pr);color:#fff;margin-left:auto}.m.a{background:var(--pr2)}
+.ref{display:inline-block;border:1px solid var(--pr);color:var(--pr);border-radius:8px;padding:0 8px;margin:4px 4px 0 0;font-size:13px;cursor:pointer;background:none}
+.sug{border:1px dashed var(--ln);border-radius:10px;padding:8px;margin:6px 0}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px}.ov .card{max-width:360px;width:100%;margin:0}
+</style></head><body>
+<header><b>📒 활동노트</b><nav id="nav"></nav></header>
+<main id="app"></main>
+<aside id="ai" aria-label="AI 도우미"><div class="row"><b style="margin-right:auto">🤖 AI 도우미</b><button class="b s" onclick="toggleAI(false)">닫기</button></div>
+<p class="mu" id="aihint">내가 저장한 기록만 참고해서 답해요. 참고용으로만 활용하세요.</p>
+<div id="log"></div><div id="ex" class="row"></div>
+<div class="row" style="flex-wrap:nowrap;margin-top:8px"><input id="q" placeholder="질문을 입력하세요" onkeydown="if(event.key==='Enter')ask()"><button class="b" onclick="ask()">보내기</button></div></aside>
+<script>
+const TY={교과:["교과 수행평가","#2f7d6b","📘"],자율:["자율","#8e6bbf","🌱"],진로:["진로","#d9822b","🧭"],동아리:["동아리","#3a7bd5","👥"],봉사:["봉사","#c2546d","🤝"],독서:["독서","#7a8b2e","📖"],기타:["기타","#6b7a80","📌"]};
+const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let items=[],view={p:"dash"},F={q:"",ty:"",sub:"",sem:"",kw:"",sort:"new"},dirty=false,chat=[],sample=null,coll=null,mode="local",sugs=[];
+const acts=()=>items.filter(i=>i.kind==="a"),ideas=()=>items.filter(i=>i.kind==="i"),byId=id=>items.find(i=>i.id===id);
+const kws=r=>(r.kw||"").split(",").map(s=>s.trim()).filter(Boolean);
+const toast=t=>{const e=document.createElement("div");e.className="toast";e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),1800)};
+function confirmBox(msg,ok){return new Promise(res=>{const o=document.createElement("div");o.className="ov";o.innerHTML=`<div class="card" role="dialog"><p>${esc(msg)}</p><div class="row"><button class="b ${ok==="삭제"?"d":""}" id="cb_y">${ok||"확인"}</button><button class="b s" id="cb_n">취소</button></div></div>`;document.body.append(o);const f=v=>{o.remove();res(v)};o.querySelector("#cb_y").onclick=()=>f(true);o.querySelector("#cb_n").onclick=()=>f(false)})}
+const uid=()=>"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const tyTag=t=>{const x=TY[t]||TY.기타;return`<span class="ty" style="background:${x[1]}">${x[2]} ${x[0]}</span>`};
+const tags=r=>kws(r).map(k=>`<span class="tag">#${esc(k)}</span>`).join("");
+const demoB=r=>r.demo?'<span class="demo">가상 예시</span>':"";
+/* storage */
+async function initStore(){
+ try{const c=await claude.use("db"),u=await claude.use("user");const id=u&&await u.id();
+  if(c&&id){coll=c.collection("data/users/"+id+"/items");mode="cloud";coll.onSnapshot(s=>{items=s.docs.map(d=>({...d.data(),id:d.id}));render()},()=>{});}}catch(e){}
+ try{sample=await claude.use("sample")}catch(e){}
+ if(mode==="local"){try{items=JSON.parse(localStorage.getItem("items")||"[]")}catch(e){items=[]}}
+ render()}
+async function put(r){const i=items.findIndex(x=>x.id===r.id);
+ if(mode==="cloud"){try{const{id,...d}=r;await coll.doc(id).set(d)}catch(e){toast("저장 실패: 다시 시도해 주세요");return false}}
+ else{if(i<0)items.push(r);else items[i]=r;try{localStorage.setItem("items",JSON.stringify(items))}catch(e){}}
+ toast("✔ 저장되었습니다");return true}
+async function del(id){if(!await confirmBox("정말 삭제할까요? 삭제하면 되돌릴 수 없어요.","삭제"))return false;
+ if(mode==="cloud"){try{await coll.doc(id).delete()}catch(e){toast("삭제 실패");return false}}
+ else{items=items.filter(x=>x.id!==id);try{localStorage.setItem("items",JSON.stringify(items))}catch(e){}}
+ toast("삭제했어요");return true}
+/* nav */
+async function go(p,id,extra){if(dirty&&!await confirmBox("저장하지 않은 내용이 있어요. 나갈까요?","나가기"))return;dirty=false;view={p,id,...extra};render();scrollTo(0,0)}
+window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
+function render(){
+ $("#nav").innerHTML=[["dash","홈"],["list","활동"],["ideas","아이디어"]].map(([p,t])=>`<button class="${view.p===p?"on":""}" onclick="go('${p}')">${t}</button>`).join("")+`<button onclick="toggleAI()">🤖 AI</button>`;
+ const v={dash,list,detail,form,ideas:ideasV,iform}[view.p];$("#app").innerHTML=v();
+ if(view.p==="form"||view.p==="iform")document.querySelectorAll("#app input,#app textarea,#app select").forEach(e=>e.addEventListener("input",()=>dirty=true))}
+/* dashboard */
+function dist(list,f){const m={};list.forEach(r=>{const k=f(r);if(k)m[k]=(m[k]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
+function bars(d,col){const mx=d[0]?.[1]||1;return d.slice(0,6).map(([k,n])=>`<div class="mu">${esc(TY[k]?TY[k][0]:k)} · ${n}</div><div class="bar" style="width:${n/mx*100}%;background:${col(k)}"></div>`).join("")||'<p class="mu">아직 데이터가 없어요.</p>'}
+function dash(){const A=acts(),I=ideas();
+ const rec=[...A].sort((a,b)=>(b.created||0)-(a.created||0)).slice(0,4),kw=dist(A.flatMap(r=>kws(r).map(k=>({k}))),x=>x.k).slice(0,12);
+ const todo=A.filter(a=>a.next).slice(0,4),open=I.filter(i=>!i.done).slice(0,4);
+ return`<h2>안녕하세요 👋</h2><p class="mu">활동 ${A.length}개 · 아이디어 ${I.length}개 ${mode==="local"?"· 이 브라우저에 저장 중":""}</p>
+ <div class="big"><button class="b" onclick="go('form')">✏️ 활동 기록하기</button><button class="b" onclick="go('iform')">💡 아이디어 메모하기</button><button class="b s" onclick="go('list',0,{focus:1})">🔎 이전 활동 검색하기</button><button class="b s" onclick="toggleAI(true)">🤖 AI에게 질문하기</button></div>
+ ${!items.length?`<div class="card"><h3>첫 기록을 남겨 볼까요?</h3><p>‘활동 기록하기’에서 제목과 활동 유형만 적어도 저장할 수 있어요. 둘러보고 싶다면 가상의 예시를 불러올 수 있어요.</p><button class="b s" onclick="loadDemo()">가상 예시 데이터 불러오기</button></div>`:""}
+ <div class="grid"><div class="card"><h3>활동 유형별</h3>${bars(dist(A,r=>r.type),k=>(TY[k]||TY.기타)[1])}</div><div class="card"><h3>과목·분야별</h3>${bars(dist(A,r=>r.subject),()=>"var(--pr)")}</div>
+ <div class="card"><h3>자주 다룬 키워드</h3>${kw.map(([k,n])=>`<span class="tag" style="font-size:${13+Math.min(n,4)*1.5}px">#${esc(k)} ${n}</span>`).join("")||'<p class="mu">키워드를 입력하면 여기에 모여요.</p>'}</div></div>
+ <h2 style="font-size:18px">최근 활동</h2><div class="grid">${rec.map(card).join("")||'<p class="mu">기록이 없어요.</p>'}</div>
+ <div class="grid"><div class="card"><h3>예정된 후속 활동</h3>${todo.map(a=>`<p class="item" onclick="go('detail','${a.id}')">→ ${esc(a.next)} <span class="mu">(${esc(a.title)})</span></p>`).join("")||'<p class="mu">없어요.</p>'}</div>
+ <div class="card"><h3>저장한 아이디어</h3>${open.map(i=>`<p class="item" onclick="go('ideas')">💡 ${esc(i.title)}</p>`).join("")||'<p class="mu">없어요.</p>'}</div></div>
+ <p class="row"><button class="b s" onclick="exportAll()">⬇ 내 기록 내려받기</button><button class="b s" onclick="document.getElementById('imp').click()">⬆ 백업 파일 가져오기</button><input id="imp" type="file" accept=".json,application/json" hidden onchange="importFile(this)"></p>`}
+function card(r){return`<div class="card item" onclick="go('detail','${r.id}')">${tyTag(r.type)}${demoB(r)}<h3 style="margin-top:6px">${esc(r.title)}</h3><div class="mu">${esc(r.subject||"")} ${r.grade?"· "+esc(r.grade)+"학년":""} ${r.sem?esc(r.sem)+"학기":""} ${r.date?"· "+esc(r.date):""}</div><div>${tags(r)}</div></div>`}
+/* list */
+function list(){const opts=(a)=>a.map(x=>`<option>${esc(x)}</option>`).join("");
+ const subs=[...new Set(acts().map(a=>a.subject).filter(Boolean))],allk=[...new Set(acts().flatMap(kws))];
+ const q=F.q.toLowerCase();let L=acts().filter(a=>(!q||[a.title,a.topic,a.subject,a.type,a.kw].join(" ").toLowerCase().includes(q))&&(!F.ty||a.type===F.ty)&&(!F.sub||a.subject===F.sub)&&(!F.sem||(a.grade+"-"+a.sem)===F.sem)&&(!F.kw||kws(a).includes(F.kw)));
+ L.sort((a,b)=>F.sort==="old"?(a.date||"").localeCompare(b.date||""):F.sort==="title"?a.title.localeCompare(b.title):(b.date||"").localeCompare(a.date||""));
+ const sems=[...new Set(acts().filter(a=>a.grade).map(a=>a.grade+"-"+(a.sem||"")))];
+ return`<div class="row"><h2 style="margin-right:auto">활동 목록</h2><button class="b" onclick="go('form')">+ 활동 기록</button></div>
+ <div class="card"><input id="sq" ${view.focus?"autofocus":""} placeholder="제목, 주제, 과목, 키워드로 검색" value="${esc(F.q)}" oninput="F.q=this.value;keepList()"><div class="two" style="margin-top:8px">
+ <select onchange="F.ty=this.value;render()"><option value="">모든 활동 유형</option>${Object.entries(TY).map(([k,v])=>`<option value="${k}" ${F.ty===k?"selected":""}>${v[0]}</option>`).join("")}</select>
+ <select onchange="F.sub=this.value;render()"><option value="">모든 과목·분야</option>${subs.map(s=>`<option ${F.sub===s?"selected":""}>${esc(s)}</option>`).join("")}</select>
+ <select onchange="F.sem=this.value;render()"><option value="">모든 학년·학기</option>${sems.map(s=>`<option value="${esc(s)}" ${F.sem===s?"selected":""}>${esc(s.replace("-","학년 "))}학기</option>`).join("")}</select>
+ <select onchange="F.kw=this.value;render()"><option value="">모든 키워드</option>${allk.map(s=>`<option ${F.kw===s?"selected":""}>${esc(s)}</option>`).join("")}</select>
+ <select onchange="F.sort=this.value;render()"><option value="new">최신순</option><option value="old" ${F.sort==="old"?"selected":""}>오래된순</option><option value="title" ${F.sort==="title"?"selected":""}>제목순</option></select>
+ <button class="b s" onclick="F={q:'',ty:'',sub:'',sem:'',kw:'',sort:'new'};render()">필터 초기화</button></div></div>
+ <div class="grid" id="res">${L.map(card).join("")||`<p class="mu">${acts().length?"조건에 맞는 활동이 없어요. 검색어를 줄이거나 필터를 바꿔 보세요.":"아직 활동이 없어요. ‘+ 활동 기록’으로 첫 기록을 남겨 보세요."}</p>`}</div>`}
+function keepList(){const p=$("#sq").selectionStart;render();const e=$("#sq");e.focus();e.setSelectionRange(p,p)}
+/* detail */
+function sim(a){const k=new Set(kws(a));return acts().filter(b=>b.id!==a.id).map(b=>({b,s:kws(b).filter(x=>k.has(x)).length*2+(b.subject&&b.subject===a.subject?1:0)})).filter(x=>x.s>0).sort((x,y)=>y.s-x.s).slice(0,4).map(x=>x.b)}
+function detail(){const a=byId(view.id);if(!a)return'<p>기록을 찾을 수 없어요.</p>';
+ const sec=(t,v)=>v?`<div class="card"><h3>${t}</h3><div style="white-space:pre-wrap">${esc(v)}</div></div>`:"";
+ const links=(a.links||"").split("\n").filter(Boolean).map(l=>/^https?:\/\//.test(l.trim())?`<a href="${esc(l.trim())}" target="_blank" rel="noopener noreferrer">${esc(l)}</a>`:esc(l)).join("<br>");
+ const con=(a.links2||[]).map(byId).filter(Boolean),sm=sim(a).filter(x=>!con.includes(x));
+ return`<button class="b s" onclick="go('list')">← 목록</button><div class="card" style="margin-top:10px">${tyTag(a.type)}${demoB(a)}<h2>${esc(a.title)}</h2><p class="mu">${esc(a.subject||"")} ${a.grade?"· "+esc(a.grade)+"학년 "+esc(a.sem)+"학기":""} ${a.date?"· "+esc(a.date):""}</p>${a.topic?`<p><b>주제·탐구 질문</b><br>${esc(a.topic)}</p>`:""}<div>${tags(a)}</div></div>
+ ${sec("활동 계기와 배경",a.bg)}${sec("실제로 한 활동과 방법",a.did)}${sec("활동 결과",a.result)}${links?`<div class="card"><h3>자료·참고 링크</h3>${links}</div>`:""}${sec("떠오른 아이디어",a.idea)}${sec("해보고 싶은 후속 활동",a.next)}
+ <div class="card"><h3>연결된 활동</h3>${con.map(c=>`<span class="ref" onclick="go('detail','${c.id}')">${esc(c.title)}</span>`).join("")||'<span class="mu">없어요. 수정 화면에서 연결할 수 있어요.</span>'}<h3 style="margin-top:12px">비슷한 활동</h3>${sm.map(c=>`<span class="ref" onclick="go('detail','${c.id}')">${esc(c.title)}</span>`).join("")||'<span class="mu">공통 키워드·과목이 있는 활동이 아직 없어요.</span>'}</div>
+ <div class="card"><h3>이어갈 탐구 제안 <span class="mu">(참고용)</span></h3><button class="b s" onclick="suggest('${a.id}')">제안 받기</button><div id="sg">${sugs.filter(s=>s.for===a.id).map(sugH).join("")}</div></div>
+ <div class="row"><button class="b" onclick="go('form','${a.id}')">수정</button><button class="b s" onclick="toggleAI(true,'${a.id}')">🤖 이 활동에 질문</button><button class="b d" onclick="del('${a.id}').then(o=>o&&go('list'))">삭제</button></div>`}
+const sugH=(s,i)=>`<div class="sug"><textarea id="s${i}">${esc(s.t)}</textarea><button class="b s" onclick="saveSug('${s.for}',${i})">이 내용으로 아이디어 메모에 저장</button></div>`;
+async function saveSug(f,i){const t=$("#s"+i).value.trim();if(!t)return;const a=byId(f);await put({id:uid(),kind:"i",title:t.slice(0,40),body:t,subject:a?.subject||"",kw:a?.kw||"",date:new Date().toISOString().slice(0,10),done:false,from:f,created:Date.now()})}
+async function suggest(id){const a=byId(id),b=$("#sg");let L;
+ if(!sample){b.innerHTML='<p class="mu">AI 기능을 지금은 쓸 수 없어요. 기록·검색은 그대로 이용할 수 있어요.</p>';return}
+ b.innerHTML='<p class="mu">생각 중…</p>';
+ try{L=await sample.json(`고등학생의 활동 기록을 보고 이어서 탐구할 만한 질문·후속 활동을 3개 제안하세요. 기록에 있는 주제·키워드와 어떻게 연결되는지 한 문장으로 함께 쓰세요. 기록에 없는 사실은 지어내지 마세요. 간결한 한국어. JSON 문자열 배열만 출력: ["제안1","제안2","제안3"]\n기록: ${JSON.stringify(slim(a))}`);
+  sugs=sugs.filter(s=>s.for!==id).concat(L.slice(0,3).map(t=>({for:id,t})));b.innerHTML=sugs.filter(s=>s.for===id).map(sugH).join("")}catch(e){b.innerHTML='<p class="mu">제안을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</p>'}}
+/* form */
+function form(){const a=view.id?byId(view.id):{};const g=(k)=>esc(a[k]||"");
+ const subs=[...new Set(acts().map(x=>x.subject).filter(Boolean))],ks=[...new Set(acts().flatMap(kws))];
+ const ta=(k,l,p="")=>`<label>${l}</label><textarea id="f_${k}" placeholder="${p}">${g(k)}</textarea>`;
+ return`<h2>${view.id?"활동 수정":"활동 기록"}</h2><div class="card"><p class="mu">필수는 제목과 활동 유형뿐이에요. 나머지는 나중에 채워도 돼요.</p>
+ <label>활동 제목 *</label><input id="f_title" value="${g("title")}">
+ <label>활동 유형 *</label><select id="f_type">${Object.entries(TY).map(([k,v])=>`<option value="${k}" ${a.type===k?"selected":""}>${v[0]}</option>`).join("")}</select>
+ <label>주제 또는 탐구 질문</label><input id="f_topic" value="${g("topic")}">
+ <div class="two"><div><label>과목 또는 관련 분야</label><input id="f_subject" list="dl_s" value="${g("subject")}"><datalist id="dl_s">${subs.map(s=>`<option value="${esc(s)}">`).join("")}</datalist></div><div><label>활동 날짜 또는 기간</label><input id="f_date" value="${g("date")}" placeholder="예: 2025-04 ~ 2025-06"></div>
+ <div><label>학년</label><select id="f_grade"><option value="">선택</option>${[1,2,3].map(n=>`<option ${a.grade==n?"selected":""}>${n}</option>`).join("")}</select></div><div><label>학기</label><select id="f_sem"><option value="">선택</option>${[1,2].map(n=>`<option ${a.sem==n?"selected":""}>${n}</option>`).join("")}</select></div></div>
+ ${ta("bg","활동 계기와 배경")}${ta("did","실제로 한 활동과 사용한 방법")}${ta("result","활동 결과")}${ta("links","사용한 자료와 참고 링크","한 줄에 하나씩")}
+ <label>핵심 키워드 (쉼표로 구분)</label><input id="f_kw" list="dl_k" value="${g("kw")}" placeholder="예: 미세플라스틱, 수질"><datalist id="dl_k">${ks.map(s=>`<option value="${esc(s)}">`).join("")}</datalist>
+ ${ta("idea","활동 중 떠오른 아이디어")}${ta("next","해보고 싶은 후속 활동")}
+ <label>연결하고 싶은 기존 활동</label>${acts().filter(x=>x.id!==view.id).map(x=>`<label style="display:flex;gap:8px;color:var(--tx);margin:2px 0"><input type="checkbox" style="width:auto" class="lk" value="${x.id}" ${(a.links2||[]).includes(x.id)?"checked":""}>${esc(x.title)}</label>`).join("")||'<span class="mu">연결할 활동이 아직 없어요.</span>'}
+ <div class="row" style="margin-top:14px"><button class="b" onclick="saveAct()">저장</button><button class="b s" onclick="go(view.id?'detail':'list',view.id)">취소</button></div></div>`}
+async function saveAct(){const v=k=>$("#f_"+k).value.trim();if(!v("title")){toast("제목을 입력해 주세요");return}
+ const o=view.id?byId(view.id):{id:uid(),kind:"a",created:Date.now()};const r={...o};
+ ["title","type","topic","subject","date","grade","sem","bg","did","result","links","kw","idea","next"].forEach(k=>r[k]=v(k));
+ r.links2=[...document.querySelectorAll(".lk:checked")].map(e=>e.value);
+ if(await put(r)){dirty=false;view={p:"detail",id:r.id};render()}}
+/* ideas */
+function ideasV(){const f=view.f||"open",L=ideas().filter(i=>f==="open"?!i.done:i.done).sort((a,b)=>(b.created||0)-(a.created||0));
+ return`<div class="row"><h2 style="margin-right:auto">아이디어·후속 활동</h2><button class="b" onclick="go('iform')">+ 메모</button></div>
+ <div class="row" style="margin-bottom:10px"><button class="b ${f==="open"?"":"s"}" onclick="view.f='open';render()">미완료</button><button class="b ${f==="done"?"":"s"}" onclick="view.f='done';render()">실행한 후속 활동</button></div>
+ <div class="grid">${L.map(i=>`<div class="card"><h3>${esc(i.title)}${demoB(i)}</h3><div class="mu">${esc(i.subject||"")} · ${esc(i.date||"")}</div><p style="white-space:pre-wrap">${esc(i.body)}</p><div>${tags(i)}</div>
+ <div class="row"><button class="b s" onclick="toggleDone('${i.id}')">${i.done?"미완료로":"실행함 ✔"}</button><button class="b s" onclick="go('iform','${i.id}')">수정</button><button class="b s" onclick="toAct('${i.id}')">활동 기록으로</button><button class="b d" onclick="del('${i.id}')">삭제</button></div>
+ ${acts().length?`<select onchange="linkIdea('${i.id}',this.value)"><option value="">기존 활동에 연결…</option>${acts().map(a=>`<option value="${a.id}" ${i.link===a.id?"selected":""}>${esc(a.title)}</option>`).join("")}</select>`:""}${i.link&&byId(i.link)?`<p class="mu item" onclick="go('detail','${i.link}')">연결: ${esc(byId(i.link).title)} →</p>`:""}</div>`).join("")||'<p class="mu">아직 메모가 없어요. 떠오른 생각을 가볍게 적어 두세요.</p>'}</div>`}
+const toggleDone=id=>{const i=byId(id);put({...i,done:!i.done})},linkIdea=(id,l)=>put({...byId(id),link:l});
+function toAct(id){const i=byId(id);view={p:"form",pre:i};const a={id:uid(),kind:"a",title:i.title,topic:i.body,subject:i.subject,kw:i.kw,type:"기타",created:Date.now()};put(a).then(()=>go("form",a.id))}
+function iform(){const a=view.id?byId(view.id):{};return`<h2>${view.id?"메모 수정":"아이디어 메모"}</h2><div class="card"><label>제목 *</label><input id="i_title" value="${esc(a.title)}"><label>내용</label><textarea id="i_body">${esc(a.body)}</textarea>
+ <div class="two"><div><label>관련 과목·분야</label><input id="i_subject" value="${esc(a.subject)}"></div><div><label>작성 날짜</label><input id="i_date" type="date" value="${esc(a.date||new Date().toISOString().slice(0,10))}"></div></div><label>키워드 (쉼표로 구분)</label><input id="i_kw" value="${esc(a.kw)}">
+ <div class="row" style="margin-top:14px"><button class="b" onclick="saveIdea()">저장</button><button class="b s" onclick="go('ideas')">취소</button></div></div>`}
+async function saveIdea(){const v=k=>$("#i_"+k).value.trim();if(!v("title")){toast("제목을 입력해 주세요");return}
+ const o=view.id?byId(view.id):{id:uid(),kind:"i",done:false,created:Date.now()};if(await put({...o,title:v("title"),body:v("body"),subject:v("subject"),date:v("date"),kw:v("kw")})){dirty=false;go("ideas")}}
+/* AI */
+const slim=r=>({id:r.id,종류:r.kind==="a"?"활동":"아이디어",제목:r.title,주제:r.topic,유형:r.type&&TY[r.type]?.[0],과목:r.subject,학년:r.grade,학기:r.sem,날짜:r.date,배경:r.bg,활동:r.did,결과:r.result,키워드:r.kw,아이디어:r.idea||r.body,후속:r.next,실행함:r.done});
+let ctxId=null;
+function toggleAI(o,id){const e=$("#ai");const on=o===undefined?!e.classList.contains("open"):o;e.classList.toggle("open",on);ctxId=id||null;if(on){$("#aihint").textContent=id?"지금 보는 활동을 중심으로 답해요. 내가 저장한 기록만 참고해요.":"내가 저장한 기록만 참고해서 답해요. 참고용으로만 활용하세요.";
+ $("#ex").innerHTML=chat.length?"":["내가 생명과학에서 했던 활동은 뭐였지?","내가 자주 다룬 관심 분야는 뭐야?","다음에 해볼 만한 후속 활동을 제안해줘"].map(t=>`<button class="ref" onclick="$('#q').value=this.textContent;ask()">${t}</button>`).join("");drawLog()}}
+function drawLog(){$("#log").innerHTML=chat.map(m=>`<div class="m ${m.r}">${esc(m.t)}${(m.refs||[]).map(id=>byId(id)?`<br><button class="ref" onclick="toggleAI(false);go('detail','${id}')">${esc(byId(id).title)}${byId(id).date?" ("+esc(byId(id).date)+")":""}</button>`:"").join("")}</div>`).join("");$("#log").scrollTop=1e9}
+async function ask(){const q=$("#q").value.trim();if(!q)return;$("#q").value="";$("#ex").innerHTML="";chat.push({r:"u",t:q});
+ if(!sample){chat.push({r:"a",t:"지금은 AI 기능을 쓸 수 없어요. (HTML 파일로 열었을 때는 AI 도우미가 작동하지 않아요.) 기록·검색 기능은 그대로 사용할 수 있어요."});drawLog();return}
+ if(!items.length){chat.push({r:"a",t:"아직 저장된 기록이 없어서 답할 근거가 없어요. 활동이나 아이디어를 먼저 기록해 보세요."});drawLog();return}
+ chat.push({r:"a",t:"생각 중…"});drawLog();
+ try{const hist=chat.slice(-9,-2).map(m=>(m.r==="u"?"학생: ":"도우미: ")+m.t).join("\n");
+  const o=await sample.json(`당신은 고등학생의 활동 기록 앱의 도우미입니다. 아래 [기록]에 있는 내용만 근거로 답하세요. 규칙: 기록에 없는 내용은 추측하지 말고 정보가 부족하다고 말하기 / 쉬운 한국어로 간결하게 / 추천 주제는 어떤 기존 활동·키워드와 연결되는지 설명 / 학생의 '알게 된 점'이나 '느낀 점'을 지어내지 않기 / 생기부 문장을 대신 써 주지 않기.\n${ctxId?"학생이 지금 보고 있는 활동 id: "+ctxId+"\n":""}반드시 JSON만 출력: {"answer":"답변","refs":["참고한 기록 id"]}\n[기록]\n${JSON.stringify(items.map(slim))}\n[이전 대화]\n${hist}\n[질문]\n${q}`);
+  chat[chat.length-1]={r:"a",t:String(o.answer||""),refs:(o.refs||[]).filter(id=>byId(id))}}catch(e){chat[chat.length-1]={r:"a",t:"답변을 가져오지 못했어요. 잠시 후 다시 시도해 주세요."}}
+ drawLog()}
+/* demo & export */
+async function loadDemo(){const d=[["가상 예시: 교내 하천 수질 조사","교과","생명과학","1","2","2025-09","교내 하천의 오염도는 어떻게 변할까?","수질, 환경, 미생물","수질 측정 키트로 3주간 채수·비교","하천 주변 시설별 수치 비교","미세플라스틱 조사로 확장"],["가상 예시: 환경 동아리 업사이클링","동아리","환경","2","1","2026-04","폐자원으로 만든 물건은 얼마나 쓰일까?","환경, 폐기물","폐플라스틱으로 화분 제작·배부","","재활용률 통계 분석"],["가상 예시: 『침묵의 봄』 독서","독서","환경","1","2","2025-11","살충제가 생태계에 준 영향은?","환경, 생태계","책 속 사례 정리","","생태계 먹이사슬 모델링"]];
+ for(const x of d)await put({id:uid(),kind:"a",demo:true,created:Date.now(),title:x[0],type:x[1],subject:x[2],grade:x[3],sem:x[4],date:x[5],topic:x[6],kw:x[7],did:x[8],result:x[9],next:x[10]});
+ await put({id:uid(),kind:"i",demo:true,created:Date.now(),title:"가상 예시: 지역 하천 변화 장기 관찰",body:"학기마다 같은 지점의 수질을 비교해 보기",subject:"생명과학",kw:"수질",date:new Date().toISOString().slice(0,10),done:false})}
+async function exportAll(){const data=JSON.stringify(items.map(({demo,...r})=>r),null,1);try{const d=await claude.use("downloads");if(d){await d.save({filename:"활동노트_기록.json",data});return}}catch(e){if(e&&e.code==="declined")return}
+ try{const u=URL.createObjectURL(new Blob([data],{type:"application/json"})),a=document.createElement("a");a.href=u;a.download="활동노트_기록.json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);toast("파일을 내려받았어요")}catch(e){toast("이 환경에서는 내려받기를 지원하지 않아요")}}
+async function importFile(inp){const f=inp.files[0];inp.value="";if(!f)return;let d;
+ try{d=JSON.parse(await f.text())}catch(e){toast("올바른 백업 파일이 아니에요");return}
+ const ok=Array.isArray(d)?d.filter(r=>r&&(r.kind==="a"||r.kind==="i")&&typeof r.id==="string"&&/^[\w-]{1,60}$/.test(r.id)&&typeof r.title==="string"):[];
+ if(!ok.length){toast("가져올 기록이 없어요");return}
+ const nw=ok.filter(r=>!byId(r.id));
+ if(!nw.length){toast("이미 모두 들어 있는 기록이에요");return}
+ if(!await confirmBox(`백업 파일에 기록 ${ok.length}개가 있어요. 현재 없는 ${nw.length}개를 추가할까요? (이미 있는 기록은 그대로 둬요)`,"가져오기"))return;
+ let n=0;for(const r of nw){if(await put({...r,demo:false}))n++}
+ render();toast(n+"개를 가져왔어요")}
+initStore();
+</script></body></html>
